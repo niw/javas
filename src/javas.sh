@@ -7,9 +7,10 @@ fi
 javas() {
   local version="$1"
 
-  # Assuming java is never being 2.0.
+  # Java version is begin 1.1 to 1.8, but Java 9 is 9.
+  # So, only numbers less than 9 are interrupted as 1.x.
   case "$version" in
-  [0-9] )
+  [0-8] )
     version="1.$version"
     ;;
   esac
@@ -20,7 +21,7 @@ javas() {
   else
     export JAVA_HOME=$(/usr/libexec/java_home -v "$version")
   fi
-  export JAVAS_JAVA_VERSION=$(java -version 2>&1|awk '/java version ".*"/{gsub(/"/, "", $3); print $3}')
+  export JAVAS_JAVA_VERSION=$(java -version 2>&1|head -n1|cut -d'"' -f2)
 }
 
 # jvs means javas or java switch.
