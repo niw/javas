@@ -1,5 +1,5 @@
-# javas requires /usr/libexec/java_home to switch java on OS X.
-# See java_home (1).
+# javas requires `/usr/libexec/java_home` to switch java on macOS.
+# See `java_home(1)`.
 if [[ ! -x /usr/libexec/java_home ]]; then
   return 1
 fi
@@ -19,9 +19,18 @@ javas() {
   if [[ -z $version ]]; then
     unset JAVA_HOME
   else
-    export JAVA_HOME=$(/usr/libexec/java_home -v "$version")
+    if JAVA_HOME=$(/usr/libexec/java_home -v "$version" 2>/dev/null); then
+      export JAVA_HOME
+    else
+      unset JAVA_HOME
+    fi
   fi
-  export JAVAS_JAVA_VERSION=$(java -version 2>&1|head -n1|cut -d'"' -f2)
+
+  if JAVAS_JAVA_VERSION=$(set -o pipefail; java -version 2>&1 | head -n1 | cut -d'"' -f2); then
+    export JAVAS_JAVA_VERSION
+  else
+    unset JAVAS_JAVA_VERSION
+  fi
 }
 
 # jvs means javas or java switch.
